@@ -6,4 +6,5 @@ import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
 public interface ClubMapper extends BaseMapper<Club> {
+    Club selectByName(String name);
 }

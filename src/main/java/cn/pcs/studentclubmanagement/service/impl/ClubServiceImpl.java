@@ -8,4 +8,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ClubServiceImpl extends ServiceImpl<ClubMapper, Club> implements ClubService {
+    @Override
+    public Club getClubByName(String name) {
+        return baseMapper.selectByName(name);
+    }
 }
