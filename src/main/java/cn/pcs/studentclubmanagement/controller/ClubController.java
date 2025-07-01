@@ -30,10 +30,18 @@ public class ClubController {
     }
 
     // 查询社团详情
-    @GetMapping("/{id}")
+//    @GetMapping("/{id}")
+//    @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
+//    public Result<Club> getClubById(@PathVariable Long id) {
+//        Club club = clubService.getById(id);
+//        return club != null ? Result.success(club) : Result.error("未找到该社团");
+//    }
+
+    // 查询社团详情（通过name）
+    @GetMapping("/detail")
     @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
-    public Result<Club> getClubById(@PathVariable Long id) {
-        Club club = clubService.getById(id);
+    public Result<Club> getClubByName(@RequestParam String name) {
+        Club club = clubService.getClubByName(name);
         return club != null ? Result.success(club) : Result.error("未找到该社团");
     }
 
