@@ -7,7 +7,12 @@ import java.util.List;
 
 public interface MembershipService extends IService<Membership> {
     boolean joinClub(Long userId, Long clubId, Long departmentId, String position);
+
     List<Membership> getMembershipsByClub(Long clubId);
+
     List<Membership> getMembershipsByUser(Long userId);
+
     Membership getSingleMembershipByUser(Long userId);
-} 
+
+    boolean reviewMembership(Long membershipId, String status);
+}

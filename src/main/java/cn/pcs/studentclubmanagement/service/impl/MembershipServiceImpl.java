@@ -18,13 +18,13 @@ import java.util.List;
 
 @Service
 public class MembershipServiceImpl extends ServiceImpl<MembershipMapper, Membership> implements MembershipService {
-    
+
     @Autowired
     private UserService userService;
-    
+
     @Autowired
     private ClubService clubService;
-    
+
     @Autowired
     private MailUtil mailUtil;
 
@@ -79,20 +79,19 @@ public class MembershipServiceImpl extends ServiceImpl<MembershipMapper, Members
         try {
             User user = userService.getById(userId);
             Club club = clubService.getById(clubId);
-            
+
             if (user != null && club != null && user.getEmail() != null) {
                 String subject = "欢迎加入社团 - " + club.getName();
                 String content = String.format(
-                    "亲爱的 %s：\n\n" +
-                    "恭喜您成功加入社团：%s\n" +
-                    "加入时间：%s\n\n" +
-                    "祝您在社团中度过愉快的时光！\n\n" +
-                    "此邮件由系统自动发送，请勿回复。",
-                    user.getRealName() != null ? user.getRealName() : user.getUsername(),
-                    club.getName(),
-                    LocalDateTime.now().toString()
-                );
-                
+                        "亲爱的 %s：\n\n" +
+                                "恭喜您成功加入社团：%s\n" +
+                                "加入时间：%s\n\n" +
+                                "祝您在社团中度过愉快的时光！\n\n" +
+                                "此邮件由系统自动发送，请勿回复。",
+                        user.getRealName() != null ? user.getRealName() : user.getUsername(),
+                        club.getName(),
+                        LocalDateTime.now().toString());
+
                 mailUtil.sendMail(user.getEmail(), subject, content);
             }
         } catch (Exception e) {
@@ -100,4 +99,17 @@ public class MembershipServiceImpl extends ServiceImpl<MembershipMapper, Members
             // 邮件发送失败不影响加入社团的主要流程
         }
     }
-} 
+
+    @Override
+    public boolean reviewMembership(Long membershipId, String status) {
+        Membership membership = this.getById(membershipId);
+        if (membership == null || !"PENDING".equals(membership.getStatus())) {
+            return false;
+        }
+        membership.setStatus(status);
+        if ("APPROVED".equals(status)) {
+            membership.setJoinedAt(java.time.LocalDateTime.now());
+        }
+        return this.updateById(membership);
+    }
+}
