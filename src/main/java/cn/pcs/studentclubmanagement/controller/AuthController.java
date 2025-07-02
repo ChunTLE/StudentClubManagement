@@ -7,6 +7,7 @@ import cn.pcs.studentclubmanagement.entity.Result;
 import cn.pcs.studentclubmanagement.entity.User;
 import cn.pcs.studentclubmanagement.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
