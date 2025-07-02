@@ -1,7 +1,7 @@
 package cn.pcs.studentclubmanagement.service.impl;
 
 import cn.pcs.studentclubmanagement.entity.Activity;
-import cn.pcs.studentclubmanagement.entity.ActivityEnrollment;
+import cn.pcs.studentclubmanagement.entity.Enrollment;
 import cn.pcs.studentclubmanagement.mapper.ActivityEnrollmentMapper;
 import cn.pcs.studentclubmanagement.mapper.ActivityMapper;
 import cn.pcs.studentclubmanagement.service.ActivityService;
@@ -30,12 +30,12 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
 
     @Override
     public boolean enrollActivity(Long activityId, Long userId) {
-        QueryWrapper<ActivityEnrollment> wrapper = new QueryWrapper<>();
+        QueryWrapper<Enrollment> wrapper = new QueryWrapper<>();
         wrapper.eq("activity_id", activityId).eq("user_id", userId);
         if (activityEnrollmentMapper.selectCount(wrapper) > 0) {
             return false; // 已报名
         }
-        ActivityEnrollment enrollment = new ActivityEnrollment();
+        Enrollment enrollment = new Enrollment();
         enrollment.setActivityId(activityId);
         enrollment.setUserId(userId);
         enrollment.setEnrolledAt(java.time.LocalDateTime.now());
@@ -43,19 +43,19 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
     }
 
     @Override
-    public List<ActivityEnrollment> getEnrollmentsByActivity(Long activityId) {
-        QueryWrapper<ActivityEnrollment> wrapper = new QueryWrapper<>();
+    public List<Enrollment> getEnrollmentsByActivity(Long activityId) {
+        QueryWrapper<Enrollment> wrapper = new QueryWrapper<>();
         wrapper.eq("activity_id", activityId);
         return activityEnrollmentMapper.selectList(wrapper);
     }
 
     @Override
     public List<Activity> getActivitiesByUser(Long userId) {
-        List<ActivityEnrollment> enrollments = activityEnrollmentMapper.selectList(
-                new QueryWrapper<ActivityEnrollment>().eq("user_id", userId)
+        List<Enrollment> enrollments = activityEnrollmentMapper.selectList(
+                new QueryWrapper<Enrollment>().eq("user_id", userId)
         );
         if (enrollments.isEmpty()) return java.util.Collections.emptyList();
-        List<Long> activityIds = enrollments.stream().map(ActivityEnrollment::getActivityId).toList();
+        List<Long> activityIds = enrollments.stream().map(Enrollment::getActivityId).toList();
         return this.listByIds(activityIds);
     }
     @Override

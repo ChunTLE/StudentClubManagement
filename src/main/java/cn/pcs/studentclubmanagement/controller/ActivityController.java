@@ -1,7 +1,7 @@
 package cn.pcs.studentclubmanagement.controller;
 
 import cn.pcs.studentclubmanagement.entity.Activity;
-import cn.pcs.studentclubmanagement.entity.ActivityEnrollment;
+import cn.pcs.studentclubmanagement.entity.Enrollment;
 import cn.pcs.studentclubmanagement.entity.Result;
 import cn.pcs.studentclubmanagement.service.ActivityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,7 +68,7 @@ public class ActivityController {
     // 查询某活动的报名用户
     @GetMapping("/{id}/enrollments")
     @PreAuthorize("hasAnyRole('ADMIN','LEADER')")
-    public Result<List<ActivityEnrollment>> getEnrollments(@PathVariable Long id) {
+    public Result<List<Enrollment>> getEnrollments(@PathVariable Long id) {
         return Result.success(activityService.getEnrollmentsByActivity(id));
     }
 
