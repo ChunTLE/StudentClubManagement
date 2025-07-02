@@ -50,7 +50,6 @@ public class MembershipController {
      * 退出社团
      */
     @DeleteMapping("/{membershipId}")
-    @PreAuthorize("hasRole('MEMBER')")
     public Result<?> leaveClub(@PathVariable Long membershipId) {
         boolean success = membershipService.removeById(membershipId);
         return success ? Result.success("成功退出社团") : Result.error("退出失败");
