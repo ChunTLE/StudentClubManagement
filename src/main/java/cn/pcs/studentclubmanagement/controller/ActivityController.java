@@ -24,10 +24,11 @@ public class ActivityController {
         return Result.success(activityService.getActivityPage(pageNum, pageSize, clubId));
     }
 
-    // 获取活动详情
-    @GetMapping("/{id}")
-    public Result<Activity> getActivity(@PathVariable Long id) {
-        Activity activity = activityService.getById(id);
+    // 获取活动详情（通过title）
+    @GetMapping("/detail")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
+    public Result<Activity> getActivityByTitle(@RequestParam String title) {
+        Activity activity = activityService.getActivityByTitle(title);
         return activity != null ? Result.success(activity) : Result.error("未找到该活动");
     }
 
@@ -76,4 +77,4 @@ public class ActivityController {
     public Result<List<Activity>> getUserActivities(@PathVariable Long userId) {
         return Result.success(activityService.getActivitiesByUser(userId));
     }
-} 
+}

@@ -8,8 +8,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import java.util.List;
 
 public interface ActivityService extends IService<Activity> {
+    Activity getActivityByTitle(String title);
     IPage<Activity> getActivityPage(int pageNum, int pageSize, Long clubId);
     boolean enrollActivity(Long activityId, Long userId);
     List<ActivityEnrollment> getEnrollmentsByActivity(Long activityId);
     List<Activity> getActivitiesByUser(Long userId);
-} 
+}

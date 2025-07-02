@@ -58,4 +58,8 @@ public class ActivityServiceImpl extends ServiceImpl<ActivityMapper, Activity> i
         List<Long> activityIds = enrollments.stream().map(ActivityEnrollment::getActivityId).toList();
         return this.listByIds(activityIds);
     }
-} 
+    @Override
+    public Activity getActivityByTitle(String title) {
+        return baseMapper.selectByTitle(title);
+    }
+}
