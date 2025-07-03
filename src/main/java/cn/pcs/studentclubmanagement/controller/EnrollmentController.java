@@ -69,4 +69,12 @@ public class EnrollmentController {
         boolean success = enrollmentService.updateById(enrollment);
         return success ? Result.success("修改成功") : Result.error("修改失败");
     }
+
+    /**
+     * 根据活动名称查询报名信息
+     */
+    @GetMapping("/activityName/{activityName}")
+    public Result<List<Enrollment>> getByActivityName(@PathVariable String activityName) {
+        return Result.success(enrollmentService.getByActivityName(activityName));
+    }
 }

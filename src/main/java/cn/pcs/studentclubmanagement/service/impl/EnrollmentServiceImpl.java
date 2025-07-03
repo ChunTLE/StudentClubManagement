@@ -3,6 +3,7 @@ package cn.pcs.studentclubmanagement.service.impl;
 import cn.pcs.studentclubmanagement.entity.Enrollment;
 import cn.pcs.studentclubmanagement.mapper.EnrollmentMapper;
 import cn.pcs.studentclubmanagement.mapper.UserMapper;
+import cn.pcs.studentclubmanagement.mapper.ActivityMapper;
 import cn.pcs.studentclubmanagement.service.EnrollmentService;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -19,6 +20,9 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private ActivityMapper activityMapper;
 
     @Override
     public boolean enroll(Long activityId, Long userId) {
@@ -59,5 +63,16 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
             return java.util.Collections.emptyList();
         }
         return enrollmentMapper.selectList(new QueryWrapper<Enrollment>().eq("user_id", userId));
+    }
+
+    @Override
+    public List<Enrollment> getByActivityName(String activityName) {
+        // 通过活动名称查找activityId
+        Long activityId = activityMapper.selectIdByTitle(activityName);
+        if (activityId == null) {
+            return java.util.Collections.emptyList();
+        }
+        return enrollmentMapper.selectList(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Enrollment>()
+                .eq("activity_id", activityId));
     }
 }

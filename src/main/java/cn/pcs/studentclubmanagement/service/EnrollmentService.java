@@ -17,4 +17,9 @@ public interface EnrollmentService extends IService<Enrollment> {
      * 根据用户名查询该用户所有报名信息
      */
     List<Enrollment> getByUsername(String username);
+
+    /**
+     * 根据活动名称查询报名信息
+     */
+    List<Enrollment> getByActivityName(String activityName);
 }
