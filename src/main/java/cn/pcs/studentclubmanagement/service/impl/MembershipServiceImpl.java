@@ -112,4 +112,11 @@ public class MembershipServiceImpl extends ServiceImpl<MembershipMapper, Members
         }
         return this.updateById(membership);
     }
+
+    @Override
+    public List<Membership> getMembershipsByStatus(String status) {
+        QueryWrapper<Membership> wrapper = new QueryWrapper<>();
+        wrapper.eq("status", status);
+        return this.list(wrapper);
+    }
 }

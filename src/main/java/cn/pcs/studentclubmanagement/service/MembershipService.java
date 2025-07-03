@@ -15,4 +15,9 @@ public interface MembershipService extends IService<Membership> {
     Membership getSingleMembershipByUser(Long userId);
 
     boolean reviewMembership(Long membershipId, String status);
+
+    /**
+     * 根据状态查询membership记录
+     */
+    List<Membership> getMembershipsByStatus(String status);
 }

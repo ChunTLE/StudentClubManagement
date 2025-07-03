@@ -64,8 +64,9 @@ public class MembershipController {
     @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
     public Result<Map<String, Object>> getAllMemberships() {
         List<Membership> membership = membershipService.list();
+        List<Membership> pendingMemberships = membershipService.getMembershipsByStatus("PENDING");
         Map<String, Object> result = new HashMap<>();
-        result.put("total", membership.size());
+        result.put("total", pendingMemberships.size());
         result.put("list", membership);
         return Result.success(result);
     }
