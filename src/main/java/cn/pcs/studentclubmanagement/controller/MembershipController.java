@@ -88,4 +88,22 @@ public class MembershipController {
             return Result.error("操作失败");
         }
     }
+
+    /**
+     * 修改membership的club_id和department_id（仅ADMIN和LEADER可用）
+     */
+    @PutMapping("/{id}/club-department")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER')")
+    public Result<?> updateClubAndDepartment(@PathVariable Long id, @RequestBody Map<String, Long> body) {
+        Long clubId = body.get("clubId");
+        Long departmentId = body.get("departmentId");
+        Membership membership = membershipService.getById(id);
+        if (membership == null) {
+            return Result.error("membership不存在");
+        }
+        if (clubId != null) membership.setClubId(clubId);
+        membership.setDepartmentId(departmentId); // 可为null
+        boolean updated = membershipService.updateById(membership);
+        return updated ? Result.success("修改成功") : Result.error("修改失败");
+    }
 }
