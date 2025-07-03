@@ -56,8 +56,12 @@ public class EnrollmentController {
      * 查询所有报名信息
      */
     @GetMapping
-    public Result<List<Enrollment>> getAllEnrollments() {
-        return Result.success(enrollmentService.list());
+    public Result<?> getAllEnrollments() {
+        List<Enrollment> enrollments = enrollmentService.list();
+        Map<String, Object> result = new java.util.HashMap<>();
+        result.put("list", enrollments);
+        result.put("total", enrollments.size());
+        return Result.success(result);
     }
 
     /**
