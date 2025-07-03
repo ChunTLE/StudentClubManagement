@@ -8,6 +8,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Department> implements DepartmentService {
 
@@ -20,5 +22,10 @@ public class DepartmentServiceImpl extends ServiceImpl<DepartmentMapper, Departm
     public IPage<Department> getDepartmentPage(int pageNum, int pageSize, Long clubId) {
         Page<Department> page = new Page<>(pageNum, pageSize);
         return baseMapper.selectDepartmentPage(page, clubId);
+    }
+
+    @Override
+    public List<Department> getAllDepartments() {
+        return this.list();
     }
 }

@@ -28,7 +28,7 @@ public class MembershipController {
             @RequestParam(required = false) Long departmentId,
             @RequestParam(required = false) String position) {
         boolean success = membershipService.joinClub(userId, clubId, departmentId, position);
-        return success ? Result.success("成功加入社团") : Result.error("加入失败，可能已经是成员");
+        return success ? Result.success("成功加入社团") : Result.error("加入失败，可能已经是该部门成员");
     }
 
     /**

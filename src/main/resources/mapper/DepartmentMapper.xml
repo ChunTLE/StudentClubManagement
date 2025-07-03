@@ -11,7 +11,7 @@
                 club_id = #{clubId}
             </if>
         </where>
-        ORDER BY id DESC
+        ORDER BY id ASC
     </select>
 
     <select id="selectByName" resultType="cn.pcs.studentclubmanagement.entity.Department">
