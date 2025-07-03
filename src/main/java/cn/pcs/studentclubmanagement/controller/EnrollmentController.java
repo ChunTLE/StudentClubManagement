@@ -24,7 +24,7 @@ public class EnrollmentController {
             return Result.error("参数不能为空");
         }
         boolean success = enrollmentService.enroll(activityId, userId);
-        return success ? Result.success("报名成功") : Result.error("已报名或报名失败");
+        return success ? Result.success("报名成功") : Result.error("已报名");
     }
 
     // 按用户ID查询报名

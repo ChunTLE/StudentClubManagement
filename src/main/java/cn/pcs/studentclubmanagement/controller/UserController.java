@@ -37,7 +37,7 @@ public class UserController {
 
     //修改用户信息（仅ADMIN和LEADER可用）
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','LEADER')")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER', 'MEMBER')")
     public Result<User> updateUser(@PathVariable Long id, @RequestBody User user) {
         user.setId(id);
         // 如果有新密码，进行加密

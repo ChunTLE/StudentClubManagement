@@ -30,7 +30,7 @@ public class DepartmentController {
         return department != null ? Result.success(department) : Result.error("未找到该部门");
     }
 
-    // 3. 新建部门(仅‘ADMIN’和‘LEADER’可访问)
+    // 3. 新建部门(仅'ADMIN'和'LEADER'可访问)
     @PostMapping
     @PreAuthorize("hasAnyRole('ADMIN','LEADER')")
     public Result<Department> createDepartment(@RequestBody Department department) {
@@ -38,7 +38,7 @@ public class DepartmentController {
         return Result.success(department);
     }
 
-    // 4. 修改部门信息(仅‘ADMIN’和‘LEADER’可访问)
+    // 4. 修改部门信息(仅'ADMIN'和'LEADER'可访问)
     @PutMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN','LEADER')")
     public Result<Department> updateDepartment(@PathVariable Long id, @RequestBody Department department) {
@@ -53,5 +53,11 @@ public class DepartmentController {
     public Result<?> deleteDepartment(@PathVariable Long id) {
         departmentService.removeById(id);
         return Result.success();
+    }
+
+    // 6. 获取所有部门()
+    @GetMapping("/all")
+    public Result<List<Department>> getAllDepartments() {
+        return Result.success(departmentService.getAllDepartments());
     }
 }

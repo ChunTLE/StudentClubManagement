@@ -41,8 +41,12 @@ public class MembershipServiceImpl extends ServiceImpl<MembershipMapper, Members
         membership.setUserId(userId);
         membership.setClubId(clubId);
         membership.setDepartmentId(departmentId);
-        membership.setPosition(position);
-        membership.setStatus("APPROVED"); // 默认批准
+        if (position == null || position.trim().isEmpty()) {
+            membership.setPosition("干事");
+        } else {
+            membership.setPosition(position);
+        }
+        membership.setStatus("PENDING"); // 默认待定
         membership.setJoinedAt(LocalDateTime.now());
         boolean success = this.save(membership);
         if (success) {
