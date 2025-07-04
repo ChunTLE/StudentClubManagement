@@ -4,4 +4,8 @@
     <select id="selectByTitle" resultType="cn.pcs.studentclubmanagement.entity.Activity">
         SELECT * FROM activity WHERE title = #{title}
     </select>
+
+    <select id="selectIdByTitle" resultType="java.lang.Long">
+        SELECT id FROM activity WHERE title = #{title}
+    </select>
 </mapper> 

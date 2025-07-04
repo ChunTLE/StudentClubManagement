@@ -1,6 +1,7 @@
 package cn.pcs.studentclubmanagement.service.impl;
 
 import cn.pcs.studentclubmanagement.entity.Enrollment;
+import cn.pcs.studentclubmanagement.entity.EnrollmentInfoVO;
 import cn.pcs.studentclubmanagement.mapper.EnrollmentMapper;
 import cn.pcs.studentclubmanagement.mapper.UserMapper;
 import cn.pcs.studentclubmanagement.mapper.ActivityMapper;
@@ -74,5 +75,39 @@ public class EnrollmentServiceImpl extends ServiceImpl<EnrollmentMapper, Enrollm
         }
         return enrollmentMapper.selectList(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Enrollment>()
                 .eq("activity_id", activityId));
+    }
+
+    @Override
+    public List<Enrollment> searchEnrollments(String username, String activityTitle) {
+        // 1. 通过用户名模糊查 userId 列表
+        List<Long> userIds = null;
+        if (username != null && !username.isEmpty()) {
+            userIds = userMapper.selectIdsByUsernameLike(username);
+            if (userIds.isEmpty()) {
+                return java.util.Collections.emptyList();
+            }
+        }
+        // 2. 通过活动名模糊查 activityId 列表
+        List<Long> activityIds = null;
+        if (activityTitle != null && !activityTitle.isEmpty()) {
+            activityIds = activityMapper.selectIdsByTitleLike(activityTitle);
+            if (activityIds.isEmpty()) {
+                return java.util.Collections.emptyList();
+            }
+        }
+        // 3. 构造查询条件
+        QueryWrapper<Enrollment> wrapper = new QueryWrapper<>();
+        if (userIds != null) {
+            wrapper.in("user_id", userIds);
+        }
+        if (activityIds != null) {
+            wrapper.in("activity_id", activityIds);
+        }
+        return enrollmentMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<EnrollmentInfoVO> searchEnrollmentInfo(String realName, String title) {
+        return enrollmentMapper.searchEnrollmentInfo(realName, title);
     }
 }

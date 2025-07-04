@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.pcs.studentclubmanagement.mapper.EnrollmentMapper">
+    <select id="searchEnrollmentInfo" resultType="cn.pcs.studentclubmanagement.entity.EnrollmentInfoVO">
+        SELECT
+            ae.id,
+            ae.user_id,
+            u.real_name,
+            ae.activity_id,
+            a.title,
+            ae.enrolled_at
+        FROM activity_enrollment ae
+        JOIN user u ON ae.user_id = u.id
+        JOIN activity a ON ae.activity_id = a.id
+        <where>
+            <if test="realName != null and realName != '' and (title == null or title == '')">
+                u.real_name LIKE CONCAT('%', #{realName}, '%')
+            </if>
+            <if test="title != null and title != '' and (realName == null or realName == '')">
+                a.title LIKE CONCAT('%', #{title}, '%')
+            </if>
+            <if test="realName != null and realName != '' and title != null and title != ''">
+                u.real_name = #{realName} AND a.title = #{title}
+            </if>
+        </where>
+    </select>
+</mapper> 

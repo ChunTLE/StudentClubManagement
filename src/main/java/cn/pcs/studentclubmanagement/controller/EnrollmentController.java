@@ -1,6 +1,7 @@
 package cn.pcs.studentclubmanagement.controller;
 
 import cn.pcs.studentclubmanagement.entity.Enrollment;
+import cn.pcs.studentclubmanagement.entity.EnrollmentInfoVO;
 import cn.pcs.studentclubmanagement.entity.Result;
 import cn.pcs.studentclubmanagement.service.EnrollmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,15 +41,15 @@ public class EnrollmentController {
     }
 
     // 删除报名
-    @DeleteMapping
+    @DeleteMapping("/delete")
     public Result<?> deleteEnrollment(@RequestParam Long activityId, @RequestParam Long userId) {
         boolean success = enrollmentService.deleteEnrollment(activityId, userId);
         return success ? Result.success("删除成功") : Result.error("删除失败");
     }
 
     // 根据用户名查询报名活动
-    @GetMapping("/username/{username}")
-    public Result<List<Enrollment>> getByUsername(@PathVariable String username) {
+    @GetMapping("/username")
+    public Result<List<Enrollment>> getByUsername(@RequestParam String username) {
         return Result.success(enrollmentService.getByUsername(username));
     }
 
@@ -77,8 +78,18 @@ public class EnrollmentController {
     /**
      * 根据活动名称查询报名信息
      */
-    @GetMapping("/activityName/{activityName}")
-    public Result<List<Enrollment>> getByActivityName(@PathVariable String activityName) {
+    @GetMapping("/activityName")
+    public Result<List<Enrollment>> getByActivityName(@RequestParam String activityName) {
         return Result.success(enrollmentService.getByActivityName(activityName));
+    }
+
+    /**
+     * 多条件、模糊/精确查询报名信息（带真实姓名和活动标题）
+     */
+    @GetMapping("/search")
+    public Result<List<EnrollmentInfoVO>> searchEnrollmentInfo(
+            @RequestParam(required = false) String realName,
+            @RequestParam(required = false) String title) {
+        return Result.success(enrollmentService.searchEnrollmentInfo(realName, title));
     }
 }
