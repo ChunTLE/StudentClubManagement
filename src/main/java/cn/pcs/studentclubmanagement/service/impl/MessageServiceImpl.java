@@ -20,4 +20,9 @@ public class MessageServiceImpl implements MessageService {
                         .eq("user_id", userId)
                         .orderByDesc("create_time"));
     }
+
+    @Override
+    public boolean save(Message message) {
+        return messageMapper.insert(message) > 0;
+    }
 } 

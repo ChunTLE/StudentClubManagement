@@ -6,4 +6,5 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 public interface MessageService {
     IPage<Message> getMessagesByUserId(Long userId, Page<Message> page);
+    boolean save(Message message);
 } 
