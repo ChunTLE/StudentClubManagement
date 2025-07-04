@@ -29,13 +29,6 @@ public class ClubController {
         return Result.success(result);
     }
 
-    // 查询社团详情
-//    @GetMapping("/{id}")
-//    @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
-//    public Result<Club> getClubById(@PathVariable Long id) {
-//        Club club = clubService.getById(id);
-//        return club != null ? Result.success(club) : Result.error("未找到该社团");
-//    }
 
     // 查询社团详情（通过name）
     @GetMapping("/detail")
@@ -68,5 +61,18 @@ public class ClubController {
     public Result<?> deleteClub(@PathVariable Long id) {
         clubService.removeById(id);
         return Result.success();
+    }
+
+    //获取每个社团人数
+    @GetMapping("/member-count")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
+    public Result<List<Map<String, Object>>> getClubMemberCounts() {
+        return Result.success(clubService.getClubMemberCounts());
+    }
+
+    @GetMapping("/member-department-count")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
+    public Result<List<Map<String, Object>>> getClubMemberAndDepartmentCounts() {
+        return Result.success(clubService.getClubMemberAndDepartmentCounts());
     }
 }
