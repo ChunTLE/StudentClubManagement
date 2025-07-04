@@ -27,6 +27,7 @@ public class SecurityConfig {
         config.addAllowedHeader("*"); // 允许所有请求头
         config.addAllowedMethod("*"); // 允许所有方法（GET,POST等）
         config.setAllowCredentials(true); // 允许携带cookie和认证信息
+        config.addExposedHeader("Content-Disposition");
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
