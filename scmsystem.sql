@@ -219,4 +219,15 @@ INSERT INTO `user` VALUES (2, 'lisi', '$2a$10$ddzMnQCjScvgdyqEL1YfbuL9SWDplHeAR5
 INSERT INTO `user` VALUES (3, 'wangwu', '$2a$10$ddzMnQCjScvgdyqEL1YfbuL9SWDplHeAR570NxbKFNjS50e93rGWm', 'wangwu@example.com', '王五', 'ADMIN', 1, '2025-06-30 15:19:11');
 INSERT INTO `user` VALUES (4, 'chenliu', '$2a$10$ddzMnQCjScvgdyqEL1YfbuL9SWDplHeAR570NxbKFNjS50e93rGWm', 'chenliu@example.com', '陈六', 'MEMBER', 0, '2025-06-30 15:19:11');
 
+-- 消息表
+CREATE TABLE message (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键ID',
+  user_id BIGINT NOT NULL COMMENT '接收者用户ID',
+  title VARCHAR(255) COMMENT '消息标题',
+  content TEXT COMMENT '消息内容',
+  type VARCHAR(50) COMMENT '消息类型',
+  is_read BOOLEAN DEFAULT FALSE COMMENT '是否已读',
+  create_time DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间'
+);
+
 SET FOREIGN_KEY_CHECKS = 1;
