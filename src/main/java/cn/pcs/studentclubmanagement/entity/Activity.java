@@ -3,6 +3,7 @@ package cn.pcs.studentclubmanagement.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import com.alibaba.excel.annotation.ExcelProperty;
 
 @Data
 @TableName("activity")

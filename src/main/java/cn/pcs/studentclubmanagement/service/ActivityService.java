@@ -13,4 +13,5 @@ public interface ActivityService extends IService<Activity> {
     boolean enrollActivity(Long activityId, Long userId);
     List<Enrollment> getEnrollmentsByActivity(Long activityId);
     List<Activity> getActivitiesByUser(Long userId);
+    List<cn.pcs.studentclubmanagement.entity.ActivityExportVO> getActivityExportList();
 }

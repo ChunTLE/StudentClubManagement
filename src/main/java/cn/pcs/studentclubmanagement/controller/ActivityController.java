@@ -4,10 +4,13 @@ import cn.pcs.studentclubmanagement.entity.Activity;
 import cn.pcs.studentclubmanagement.entity.Enrollment;
 import cn.pcs.studentclubmanagement.entity.Result;
 import cn.pcs.studentclubmanagement.service.ActivityService;
+import com.alibaba.excel.EasyExcel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.net.URLEncoder;
 import java.util.List;
 
 @RestController
@@ -16,7 +19,7 @@ public class ActivityController {
     @Autowired
     private ActivityService activityService;
 
-    // 分页获取活动列表，可选clubId
+    // 分页获取活动列表
     @GetMapping
     public Result<?> getActivities(@RequestParam(defaultValue = "1") int pageNum,
                                    @RequestParam(defaultValue = "10") int pageSize,
@@ -76,5 +79,17 @@ public class ActivityController {
     @GetMapping("/user/{userId}")
     public Result<List<Activity>> getUserActivities(@PathVariable Long userId) {
         return Result.success(activityService.getActivitiesByUser(userId));
+    }
+
+    //Excel数据导出
+    @GetMapping("/export")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER')")
+    public void exportActivities(HttpServletResponse response) throws Exception {
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setCharacterEncoding("utf-8");
+        String fileName = URLEncoder.encode("活动数据", "UTF-8").replaceAll("\\+", "%20");
+        response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        EasyExcel.write(response.getOutputStream(), cn.pcs.studentclubmanagement.entity.ActivityExportVO.class)
+                .sheet("活动列表").doWrite(activityService.getActivityExportList());
     }
 }
