@@ -6,6 +6,8 @@ import cn.pcs.studentclubmanagement.service.UserService;
 import cn.pcs.studentclubmanagement.util.PasswordUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -59,5 +61,18 @@ public class UserController {
         user.setStatus(status);
         boolean updated = userService.updateById(user);
         return updated ? Result.success() : Result.error("状态更新失败");
+    }
+
+    // 获取当前登录用户信息
+    @GetMapping("/me")
+    public Result<User> getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        User user = userService.findByUsername(username);
+        if (user != null) {
+            return Result.success(user);
+        } else {
+            return Result.error("未找到当前用户信息");
+        }
     }
 }
