@@ -90,7 +90,7 @@ public class UserController {
             HttpServletResponse response) throws Exception {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setCharacterEncoding("utf-8");
-        
+
         // 构建文件名，包含筛选条件信息
         StringBuilder fileNameBuilder = new StringBuilder("用户数据");
         if (role != null && !role.isEmpty()) {
@@ -106,10 +106,10 @@ public class UserController {
         if (status != null) {
             fileNameBuilder.append("_").append(status == 1 ? "正常" : "封禁");
         }
-        
+
         String fileName = URLEncoder.encode(fileNameBuilder.toString(), "UTF-8").replaceAll("\\+", "%20");
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
-        
+
         // 根据筛选条件获取数据
         java.util.List<UserExportVO> exportData = userService.getUserExportList(role, status);
         EasyExcel.write(response.getOutputStream(), cn.pcs.studentclubmanagement.entity.UserExportVO.class)
@@ -167,6 +167,71 @@ public class UserController {
             return Result.success("导入成功：" + success + "条，失败：" + fail + "条。" + (fail > 0 ? failMsg.toString() : ""));
         } catch (Exception e) {
             return Result.error("导入失败：" + e.getMessage());
+        }
+    }
+
+    // 本地上传用户头像
+    @PutMapping("/{id}/avatar")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
+    public Result<?> uploadAvatar(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        User user = userService.getById(id);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        if (file.isEmpty()) {
+            return Result.error("文件为空");
+        }
+        try {
+            // 生成唯一文件名
+            String originalFilename = file.getOriginalFilename();
+            String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String newFileName = java.util.UUID.randomUUID().toString() + suffix;
+            // 使用绝对路径保存到项目根目录下的 uploads/avatar/
+            String uploadDir = System.getProperty("user.dir") + java.io.File.separator + "uploads" + java.io.File.separator + "avatar" + java.io.File.separator;
+            java.io.File dir = new java.io.File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+            java.io.File dest = new java.io.File(uploadDir + newFileName);
+            file.transferTo(dest);
+            // 生成可访问的URL（假设静态资源映射为 /uploads/**）
+            String avatarUrl = "/uploads/avatar/" + newFileName;
+            user.setAvatarUrl(avatarUrl);
+            boolean updated = userService.updateById(user);
+            return updated ? Result.success(user) : Result.error("头像更新失败");
+        } catch (Exception e) {
+            return Result.error("上传失败: " + e.getMessage());
+        }
+    }
+
+    // 流式获取用户头像
+    @GetMapping("/{id}/avatar")
+    public void getAvatar(@PathVariable Long id, HttpServletResponse response) {
+        User user = userService.getById(id);
+        if (user == null || user.getAvatarUrl() == null || user.getAvatarUrl().isEmpty()) {
+            response.setStatus(404);
+            return;
+        }
+        // 头像物理路径
+        String avatarPath = System.getProperty("user.dir") + java.io.File.separator + "uploads" + java.io.File.separator + "avatar" + java.io.File.separator + user.getAvatarUrl().substring(user.getAvatarUrl().lastIndexOf("/") + 1);
+        java.io.File file = new java.io.File(avatarPath);
+        if (!file.exists()) {
+            response.setStatus(404);
+            return;
+        }
+        // 根据文件后缀设置Content-Type
+        String contentType = "image/jpeg";
+        String lower = avatarPath.toLowerCase();
+        if (lower.endsWith(".png")) contentType = "image/png";
+        else if (lower.endsWith(".gif")) contentType = "image/gif";
+        response.setContentType(contentType);
+        try (java.io.FileInputStream fis = new java.io.FileInputStream(file); java.io.OutputStream os = response.getOutputStream()) {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = fis.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
+            }
+            os.flush();
+        } catch (Exception e) {
+            response.setStatus(500);
         }
     }
 }

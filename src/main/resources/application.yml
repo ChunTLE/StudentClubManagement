@@ -2,7 +2,7 @@ spring:
     datasource:
         url: jdbc:mysql://localhost:3306/scmsystem?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
         username: root
-        password: 1234
+        password: yehdk151618
         driver-class-name: com.mysql.cj.jdbc.Driver
         application:
             name: StudentClubManagement

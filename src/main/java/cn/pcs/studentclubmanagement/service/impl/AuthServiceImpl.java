@@ -80,6 +80,8 @@ public class AuthServiceImpl implements AuthService {
         user.setRole(registerRequest.getRole() != null ? registerRequest.getRole() : "MEMBER");
         user.setStatus(1); // 默认启用
         user.setCreatedAt(LocalDateTime.now());
+        // 设置默认头像
+        user.setAvatarUrl("/uploads/avatar/116144a4-f8bd-4382-b2fe-75d812eff490.jpg");
 
         // 保存用户
         userService.save(user);
