@@ -1,6 +1,7 @@
 package cn.pcs.studentclubmanagement.interceptor;
 
 import cn.pcs.studentclubmanagement.util.JwtUtil;
+import cn.pcs.studentclubmanagement.util.RedisTokenUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,9 @@ public class JwtInterceptor implements HandlerInterceptor {
     @Autowired
     private JwtUtil jwtUtil;
 
+    @Autowired
+    private RedisTokenUtil redisTokenUtil;
+
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
             throws Exception {
@@ -40,14 +44,23 @@ public class JwtInterceptor implements HandlerInterceptor {
         // 提取令牌
         String token = jwtUtil.extractTokenFromHeader(authHeader);
 
-        // 验证令牌
+        // 验证JWT令牌格式
         if (token == null || !jwtUtil.validateToken(token)) {
-            sendErrorResponse(response, 401, "令牌无效或已过期");
+            sendErrorResponse(response, 401, "令牌格式无效或已过期");
+            return false;
+        }
+
+        // 获取用户ID
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        // 检查token是否在Redis中存在且有效（5分钟有效期）
+        if (!redisTokenUtil.isTokenValid(token, userId)) {
+            sendErrorResponse(response, 401, "令牌已失效，请重新登录");
             return false;
         }
 
         // 将用户信息添加到请求属性中，供后续使用
-        request.setAttribute("userId", jwtUtil.getUserIdFromToken(token));
+        request.setAttribute("userId", userId);
         request.setAttribute("username", jwtUtil.getUsernameFromToken(token));
         request.setAttribute("role", jwtUtil.getRoleFromToken(token));
 
