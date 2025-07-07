@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 import java.time.format.DateTimeFormatter;
+import org.springframework.util.StringUtils;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
@@ -19,8 +20,31 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public java.util.List<UserExportVO> getUserExportList() {
         java.util.List<User> users = this.list();
+        return convertToExportVO(users);
+    }
+
+    @Override
+    public java.util.List<UserExportVO> getUserExportList(String role, Integer status) {
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        
+        // 角色筛选
+        if (StringUtils.hasText(role)) {
+            queryWrapper.eq("role", role);
+        }
+        
+        // 状态筛选
+        if (status != null) {
+            queryWrapper.eq("status", status);
+        }
+        
+        java.util.List<User> users = this.list(queryWrapper);
+        return convertToExportVO(users);
+    }
+
+    private java.util.List<UserExportVO> convertToExportVO(java.util.List<User> users) {
         java.util.List<UserExportVO> exportList = new java.util.ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        
         for (User user : users) {
             UserExportVO vo = new UserExportVO();
             vo.setId(user.getId());

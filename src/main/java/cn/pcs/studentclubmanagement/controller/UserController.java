@@ -84,13 +84,36 @@ public class UserController {
     // 用户数据导出接口
     @GetMapping("/export")
     @PreAuthorize("hasAnyRole('ADMIN','LEADER')")
-    public void exportUsers(HttpServletResponse response) throws Exception {
+    public void exportUsers(
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) Integer status,
+            HttpServletResponse response) throws Exception {
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         response.setCharacterEncoding("utf-8");
-        String fileName = URLEncoder.encode("用户数据", "UTF-8").replaceAll("\\+", "%20");
+        
+        // 构建文件名，包含筛选条件信息
+        StringBuilder fileNameBuilder = new StringBuilder("用户数据");
+        if (role != null && !role.isEmpty()) {
+            String roleName = "";
+            switch (role) {
+                case "ADMIN": roleName = "管理员"; break;
+                case "LEADER": roleName = "社团负责人"; break;
+                case "MEMBER": roleName = "干事"; break;
+                default: roleName = role;
+            }
+            fileNameBuilder.append("_").append(roleName);
+        }
+        if (status != null) {
+            fileNameBuilder.append("_").append(status == 1 ? "正常" : "封禁");
+        }
+        
+        String fileName = URLEncoder.encode(fileNameBuilder.toString(), "UTF-8").replaceAll("\\+", "%20");
         response.setHeader("Content-disposition", "attachment;filename*=utf-8''" + fileName + ".xlsx");
+        
+        // 根据筛选条件获取数据
+        java.util.List<UserExportVO> exportData = userService.getUserExportList(role, status);
         EasyExcel.write(response.getOutputStream(), cn.pcs.studentclubmanagement.entity.UserExportVO.class)
-                .sheet("用户列表").doWrite(userService.getUserExportList());
+                .sheet("用户列表").doWrite(exportData);
     }
 
     // 用户数据导入接口
