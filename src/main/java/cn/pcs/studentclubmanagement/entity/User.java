@@ -25,4 +25,7 @@ public class User {
 
     @TableField("created_at")
     private LocalDateTime createdAt;
+
+    @TableField("avatar_url")
+    private String avatarUrl; // 头像图片URL
 }

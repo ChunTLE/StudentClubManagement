@@ -169,4 +169,36 @@ public class UserController {
             return Result.error("导入失败：" + e.getMessage());
         }
     }
+
+    // 本地上传用户头像
+    @PutMapping("/{id}/avatar")
+    @PreAuthorize("hasAnyRole('ADMIN','LEADER','MEMBER')")
+    public Result<?> uploadAvatar(@PathVariable Long id, @RequestParam("file") MultipartFile file) {
+        User user = userService.getById(id);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        if (file.isEmpty()) {
+            return Result.error("文件为空");
+        }
+        try {
+            // 生成唯一文件名
+            String originalFilename = file.getOriginalFilename();
+            String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));
+            String newFileName = java.util.UUID.randomUUID().toString() + suffix;
+            // 使用绝对路径保存到项目根目录下的 uploads/avatar/
+            String uploadDir = System.getProperty("user.dir") + java.io.File.separator + "uploads" + java.io.File.separator + "avatar" + java.io.File.separator;
+            java.io.File dir = new java.io.File(uploadDir);
+            if (!dir.exists()) dir.mkdirs();
+            java.io.File dest = new java.io.File(uploadDir + newFileName);
+            file.transferTo(dest);
+            // 生成可访问的URL（假设静态资源映射为 /uploads/**）
+            String avatarUrl = "/uploads/avatar/" + newFileName;
+            user.setAvatarUrl(avatarUrl);
+            boolean updated = userService.updateById(user);
+            return updated ? Result.success(user) : Result.error("头像更新失败");
+        } catch (Exception e) {
+            return Result.error("上传失败: " + e.getMessage());
+        }
+    }
 }
