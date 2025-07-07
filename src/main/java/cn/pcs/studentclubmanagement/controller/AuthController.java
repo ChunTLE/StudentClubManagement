@@ -8,12 +8,16 @@ import cn.pcs.studentclubmanagement.entity.User;
 import cn.pcs.studentclubmanagement.service.AuthService;
 import cn.pcs.studentclubmanagement.util.JwtUtil;
 import cn.pcs.studentclubmanagement.util.RedisTokenUtil;
+import cn.pcs.studentclubmanagement.util.SimpleCaptchaUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -29,6 +33,27 @@ public class AuthController {
     @Autowired
     private RedisTokenUtil redisTokenUtil;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
+    /**
+     * 获取验证码接口
+     * 
+     * @return 验证码信息
+     */
+    @GetMapping("/captcha")
+    public Result<Map<String, String>> getCaptcha() {
+        SimpleCaptchaUtil.CaptchaResult captcha = SimpleCaptchaUtil.createCaptcha();
+        String captchaId = UUID.randomUUID().toString();
+        // 存入Redis，5分钟有效
+        redisTemplate.opsForValue().set("captcha:" + captchaId, captcha.code, 5, TimeUnit.MINUTES);
+
+        Map<String, String> result = new HashMap<>();
+        result.put("captchaId", captchaId);
+        result.put("captchaImage", "data:image/png;base64," + captcha.base64);
+        return Result.success(result);
+    }
+
     /**
      * 用户登录
      * 
@@ -37,6 +62,18 @@ public class AuthController {
      */
     @PostMapping("/login")
     public Result<LoginResponse> login(@RequestBody LoginRequest loginRequest) {
+        String redisKey = "captcha:" + loginRequest.getCaptchaId();
+        String realCaptcha = redisTemplate.opsForValue().get(redisKey);
+
+        if (realCaptcha == null) {
+            return Result.error("验证码已过期，请刷新重试");
+        }
+        if (!realCaptcha.equalsIgnoreCase(loginRequest.getCaptcha())) {
+            return Result.error("验证码错误");
+        }
+        // 校验通过后删除验证码，防止复用
+        redisTemplate.delete(redisKey);
+
         try {
             LoginResponse response = authService.login(loginRequest);
             return Result.success(response);

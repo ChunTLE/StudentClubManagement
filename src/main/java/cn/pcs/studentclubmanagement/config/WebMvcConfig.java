@@ -18,7 +18,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addPathPatterns("/api/**") // 拦截所有/api路径
                 .excludePathPatterns(
                         "/api/auth/login", // 排除登录接口
-                        "/api/auth/register" // 排除注册接口
+                        "/api/auth/register", // 排除注册接口
+                        "/api/auth/captcha"
                 );
     }
 }
