@@ -42,9 +42,9 @@ public class SecurityConfig {
                 }) // 允许CORS
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/auth/login", "/api/auth/register").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/leader/**","/api/finance-records/**").hasAnyRole("LEADER", "ADMIN")
+                        .requestMatchers("/api/leader/**", "/api/finance-records/**").hasAnyRole("LEADER", "ADMIN")
                         .requestMatchers("/api/member/**", "/api/users/**").hasAnyRole("MEMBER", "LEADER", "ADMIN")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

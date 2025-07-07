@@ -7,6 +7,7 @@ import cn.pcs.studentclubmanagement.entity.User;
 import cn.pcs.studentclubmanagement.service.AuthService;
 import cn.pcs.studentclubmanagement.service.UserService;
 import cn.pcs.studentclubmanagement.util.JwtUtil;
+import cn.pcs.studentclubmanagement.util.RedisTokenUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,9 @@ public class AuthServiceImpl implements AuthService {
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private RedisTokenUtil redisTokenUtil;
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -42,13 +46,19 @@ public class AuthServiceImpl implements AuthService {
             throw new RuntimeException("用户已被禁用");
         }
 
+        // 生成JWT token
+        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole());
+
+        // 将token存储到Redis中，设置5分钟有效期
+        redisTokenUtil.storeToken(token, user.getId());
+
         // 创建登录响应
         LoginResponse response = new LoginResponse();
         response.setUserId(user.getId());
         response.setUsername(user.getUsername());
         response.setRealName(user.getRealName());
         response.setRole(user.getRole());
-        response.setToken(jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole())); // 生成JWT令牌
+        response.setToken(token);
 
         return response;
     }
